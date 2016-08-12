@@ -21,5 +21,5 @@ Requirements:
 python -m pip install pyradiodns
 
 The resolver also uses a Boost Info file parser (from https://github.com/thecodemaiden/) and a RadioDNS SPI library
-(from https://github.com/magicbadger/hybridspi-dab) but these files are included.
+(from https://github.com/magicbadger/python-hybridspi) but these files are included.
 
