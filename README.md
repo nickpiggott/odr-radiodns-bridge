@@ -5,9 +5,9 @@ This is beginnings of a toolset being developed to bridge RadioDNS applications 
 into the OpenDigitalRadio environment.
 
 Modules will provide functionality to:
-> Read an odr-dabmux configuration file and locate RadioDNS applications for the services configured in it
-> Bridge visuals from IP into DAB Slideshow
-> Compile a DAB EPG for all services on the multiplex and transmit it as a packet mode channel
+* Read an odr-dabmux configuration file and locate RadioDNS applications for the services configured in it
+* Bridge visuals from IP into DAB Slideshow
+* Compile a DAB EPG for all services on the multiplex and transmit it as a packet mode channel
 
 The current resolver takes the form:
 
