@@ -19,9 +19,9 @@
 #===============================================================================
 
 from __future__ import print_function
+import sys
 from boost_info_parser import BoostInfoParser
 from pyradiodns.rdns import RadioDNS 
-import sys
 from spi import DabBearer
 
 
@@ -33,10 +33,14 @@ def main():
 		print("You need to provide the filename of an odr-dabmux configuration file as a parameter")
 		return
 
-	services = resolveDNS(parseMuxConfig(filename))
-	configurationWarnings(services)
-	print(returnSlideshowServices(services))
-	print(returnEPGServices(services))
+	
+	configurationWarnings(resolveDNS(parseMuxConfig(filename)))
+	slideshowServices(filename,printServices)
+	EPGServices(filename,printServices)
+	
+def printServices(services):
+	print(services)
+	return
 	
 def parseMuxConfig(filename):
 	parser = BoostInfoParser()
@@ -130,23 +134,23 @@ def resolveDNS(services):
 		service["dns"] = result
 	return services
 	
-def returnSlideshowServices(services):
+def slideshowServices(filename,callback):
+	services = resolveDNS(parseMuxConfig(filename))
 	slideshowServices = []
-	for service in services:
-		radiovis = []
-		radiovis_http = []
 	
+	for service in services:
+
 		try:
-			radiovis = (service["dns"]["applications"]["radiovis"]["supported"])
+			radiovis = service["dns"]["applications"]["radiovis"]["supported"]
 		except:
-			pass
-		
+			radiovis = []
+
 		try:
-			radiovis_http = (service["dns"]["applications"]["radiovis-http"]["supported"])
+			radiovis_http = service["dns"]["applications"]["radiovis-http"]["supported"]
 		except:
-			pass
-		
-		if service["hasSlideshow"] == True and (len(radiovis)>0 or len(radiovis_http)>0):
+			radiovis_http = []
+	
+		if service["hasSlideshow"] and (radiovis or radiovis_http):
 			slideshowServices.append(
 				{ "fqdn" : service["dns"]["authorative_fqdn"],
 				"bearer" : service["bearer"],
@@ -154,9 +158,11 @@ def returnSlideshowServices(services):
 				"radiovis-http" : radiovis_http
 				})
 			
-	return slideshowServices
+	callback(slideshowServices)
+	return
 
-def returnEPGServices(services):
+def EPGServices(filename,callback):
+	services = resolveDNS(parseMuxConfig(filename))
 	EPGServices = []
 	for service in services:
 		radioepg = []
@@ -172,30 +178,30 @@ def returnEPGServices(services):
 				"bearer" : service["bearer"],
 				"radioepg" : radioepg
 				})
-			
-	return EPGServices
+		
+	callback(EPGServices)
+	return
 	
 def configurationWarnings(services):
 
 	EPGtempURI = []
 	
 	for service in services:
-		radiovis = []
 
 		try:
-			radiovis = service["dns"]["applications"]["radiovis"]["supported"]
+			radiovis = len(service["dns"]["applications"]["radiovis"]["supported"])>0
 		except:
-			pass
-		
+			radiovis = False
+
 		try:
-			radiovis = service["dns"]["applications"]["radiovis-http"]["supported"]
+			radiovis_http = len(service["dns"]["applications"]["radiovis-http"]["supported"])>0
 		except:
-			pass
-		
-		if service["hasSlideshow"] == False and len(radiovis)>0:
+			radiovis_http = False
+			
+		if not service["hasSlideshow"] and (radiovis or radiovis_http):
 			eprint("WARNING:" + service["service"] + " '" + service["label"] + "' has hybrid visual slideshow service but no figtype = 0x02 definition in its component definition.")
 		
-		if service["hasSlideshow"] == True and len(radiovis)==0:
+		if service["hasSlideshow"] and not radiovis and not radiovis_http:
 			eprint("WARNING:" + service["service"] + " '" + service["label"] + "' is configured to send DAB Slideshow with a figtype = 0x02 defined in its component definition, but has no hybrid visual source available.")
 			
 		if service["hasEPG"] == True:
