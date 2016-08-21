@@ -35,11 +35,14 @@ def main():
 
 	
 	configurationWarnings(resolveDNS(parseMuxConfig(filename)))
+	print("\nSlideshow Services:")
 	slideshowServices(filename,printServices)
+	print("\nEPG Services:")
 	EPGServices(filename,printServices)
 	
 def printServices(services):
-	print(services)
+	if len(services):
+		print(services)
 	return
 	
 def parseMuxConfig(filename):
@@ -163,23 +166,43 @@ def slideshowServices(filename,callback):
 
 def EPGServices(filename,callback):
 	services = resolveDNS(parseMuxConfig(filename))
-	EPGServices = []
+
+	radioepg_fqdn_list = []
+
+	
 	for service in services:
-		radioepg = []
+		radioepg_fqdn = ""
 	
 		try:
-			radioepg = (service["dns"]["applications"]["radioepg"]["supported"])
+			radioepg_fqdn = service["dns"]["authorative_fqdn"]
 		except:
 			pass
 
-		if len(radioepg)>0:
-			EPGServices.append(
-				{ "fqdn" : service["dns"]["authorative_fqdn"],
-				"bearer" : service["bearer"],
-				"radioepg" : radioepg
-				})
-		
-	callback(EPGServices)
+		if radioepg_fqdn:
+				# check to see if we already have that FQDN
+				adding = True
+				for s in radioepg_fqdn_list:
+					if radioepg_fqdn == s["fqdn"]:
+						adding = False
+						continue
+
+				if adding:
+						EPGBearer = []
+						EPGServer = []					
+						
+						for s in services:
+							if not s.has_key("dns"): continue
+							if not s["dns"]: continue
+							if not s["dns"].has_key("authorative_fqdn"): continue
+							if radioepg_fqdn == s["dns"]["authorative_fqdn"]:
+								EPGBearer.append(s["bearer"])
+								EPGServer = (s["dns"]["applications"]["radioepg"]["servers"])
+						radioepg_fqdn_list.append({"fqdn" : radioepg_fqdn,
+								"bearers": EPGBearer,
+								"servers" : EPGServer })
+
+
+	callback(radioepg_fqdn_list)
 	return
 	
 def configurationWarnings(services):

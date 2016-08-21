@@ -8,7 +8,7 @@
 
 ; ensemble parameters
 ensemble {
-id 0xc185 ; you can also use decimal if you want
+id 0xc1c8 ; you can also use decimal if you want
 ecc 0xe1 ; Extended Country Code
 
     ;local-time-offset 0     ; in hours, supports half-hour offsets
