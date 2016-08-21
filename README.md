@@ -1,4 +1,5 @@
 # odr-radiodns-bridge
+
 Tools to bridge RadioDNS applications into the OpenDigitalRadio environment
 
 This is beginnings of a toolset being developed to bridge RadioDNS applications (visuals, service and programme information)
@@ -16,10 +17,12 @@ The current resolver takes the form:
 and outputs a list of services that have RadioDNS visuals and service and programme information.
 There are functions which return lists of services supporting slideshow, and lists of services for inclusion in a DAB EPG
 
-Requirements:
-- You'll need to install Sam Starling's pyradiodns library to locate the hosts providing RadioDNS services
-python -m pip install pyradiodns
+## Dependencies
 
-The resolver also uses a Boost Info file parser (from https://github.com/thecodemaiden/) and a RadioDNS SPI library
-(from https://github.com/magicbadger/python-hybridspi) but these files are included.
+Install the following from pip:
+
+* hybridspi
+* pyradiodns 
+
+The resolver also uses a Boost Info file parser (from https://github.com/thecodemaiden/), which is included.
 

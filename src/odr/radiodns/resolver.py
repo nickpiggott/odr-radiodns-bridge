@@ -18,34 +18,14 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #===============================================================================
 
-from __future__ import print_function
-import sys
 from boost_info_parser import BoostInfoParser
 from pyradiodns.rdns import RadioDNS 
 from spi import DabBearer
+import logging
 
+log = logging.getLogger('odr.radiodns')
 
-def main():
-	try:
-		filename = sys.argv[1]
-
-	except:
-		print("You need to provide the filename of an odr-dabmux configuration file as a parameter")
-		return
-
-	
-	configurationWarnings(resolveDNS(parseMuxConfig(filename)))
-	print("\nSlideshow Services:")
-	slideshowServices(filename,printServices)
-	print("\nEPG Services:")
-	EPGServices(filename,printServices)
-	
-def printServices(services):
-	if len(services):
-		print(services)
-	return
-	
-def parseMuxConfig(filename):
+def parse_mux_config(filename):
 	parser = BoostInfoParser()
 	parser.read(filename)
 	root = parser.getRoot()
@@ -126,7 +106,7 @@ def parseMuxConfig(filename):
 	
 	return services
 				
-def resolveDNS(services):
+def resolve_dns(services):
 	radiodns = RadioDNS()
 	for service in services:
 		bearer = service["bearer"]
@@ -137,8 +117,8 @@ def resolveDNS(services):
 		service["dns"] = result
 	return services
 	
-def slideshowServices(filename,callback):
-	services = resolveDNS(parseMuxConfig(filename))
+def resolve_slideshow(filename,callback):
+	services = resolve_dns(parse_mux_config(filename))
 	slideshowServices = []
 	
 	for service in services:
@@ -164,8 +144,8 @@ def slideshowServices(filename,callback):
 	callback(slideshowServices)
 	return
 
-def EPGServices(filename,callback):
-	services = resolveDNS(parseMuxConfig(filename))
+def resolve_epg(filename,callback):
+	services = resolve_dns(parse_mux_config(filename))
 
 	radioepg_fqdn_list = []
 
@@ -205,7 +185,7 @@ def EPGServices(filename,callback):
 	callback(radioepg_fqdn_list)
 	return
 	
-def configurationWarnings(services):
+def check_warnings(services):
 
 	EPGtempURI = []
 	
@@ -222,10 +202,10 @@ def configurationWarnings(services):
 			radiovis_http = False
 			
 		if not service["hasSlideshow"] and (radiovis or radiovis_http):
-			eprint("WARNING:" + service["service"] + " '" + service["label"] + "' has hybrid visual slideshow service but no figtype = 0x02 definition in its component definition.")
+			log.error("WARNING:" + service["service"] + " '" + service["label"] + "' has hybrid visual slideshow service but no figtype = 0x02 definition in its component definition.")
 		
 		if service["hasSlideshow"] and not radiovis and not radiovis_http:
-			eprint("WARNING:" + service["service"] + " '" + service["label"] + "' is configured to send DAB Slideshow with a figtype = 0x02 defined in its component definition, but has no hybrid visual source available.")
+			log.error("WARNING:" + service["service"] + " '" + service["label"] + "' is configured to send DAB Slideshow with a figtype = 0x02 defined in its component definition, but has no hybrid visual source available.")
 			
 		if service["hasEPG"] == True:
 			EPGtempURI.append(service["EPGinputURI"])
@@ -233,13 +213,4 @@ def configurationWarnings(services):
 	EPGtempURI = set(EPGtempURI)
 	
 	if len(EPGtempURI) > 1 :
-		eprint("WARNING: More than one EPG subchannel input file is defined." , EPGtempURI)
-
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)	
-
-		
-if __name__ == '__main__':
-    main()
-	
+		log.error("WARNING: More than one EPG subchannel input file is defined: %s", EPGtempURI)
