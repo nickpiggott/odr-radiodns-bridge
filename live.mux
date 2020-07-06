@@ -3,6 +3,8 @@
 ;
 ; This file has been stripped to only have values used by ODR-RadioDNS-Bridge
 ; It is not an example of a complete configuration, and is not valid for using with odr-dabmux
+; This example refers one audio service (srv-pgm1) with a Slideshow and
+; One Enhanced Packet Data service carrying SPI on packet address 1
 ; 
 
 
@@ -10,349 +12,43 @@
 ensemble {
 id 0xc1c8 ; you can also use decimal if you want
 ecc 0xe1 ; Extended Country Code
-
-    ;local-time-offset 0     ; in hours, supports half-hour offsets
-                            ; or
-    local-time-offset auto  ; automatically calculate from system local time
-
-    international-table 1 ; See TS 101 756 clause 5.7
-                          ; 1 corresponds to the PTy used in RDS
-                          ; 2 corresponds to program types used in north america
-    label "ODR-RadioDNS"
-    shortlabel "ODR-DNS"
 }
 
 ; Definition of DAB services
 services {
-    ; Services have uid for config and remote control
 srv-pgm1 {
 label "Capital FM"
-shortlabel "Capital"
-pty 10 
-language 9
 id 0xc479
+}
 
-}
-srv-pgm2 {
-label "Heart London"
-shortlabel "Heart"
-pty 10
-language 9
-id 0xc460
-}
-srv-pgm3 {
-label "Test 3"
-shortlabel "Test 3"
-pty 10
-language 9
-id 0xc6d4
-}
-srv-pgm4 {
-label "Test 4"
-shortlabel "Test 4"
-pty 10
-language 9
-id 0xced6
-}
-srv-pgm5 {
-label "Test 5"
-shortlabel "Test 5"
-pty 3
-language 9
-id 0xc4d6
-}
-srv-pgm6 {
-label "Test 6"
-shortlabel "Test 6"
-pty 10
-language 9
-id 0xc4d4
-}
-srv-pgm7 {
-label "Test 7"
-shortlabel "Test 7"
-pty 10
-language 9
-id 0xc080
-}
-srv-pgm8 {
-label "Test 8"
-shortlabel "Test 8"
-pty 10
-language 9
-id 0xc987
-}
-srv-pgm9 {
-label "Test 9"
-shortlabel "Test 9"
-pty 3
-language 9
-id 0xc7d4
-}
-srv-epg {
-label "EPG"
-shortlabel "EPG"
+srv-spi {
+label "SPI Service"
 id 0xe1c000d4
 }
 }
-; Define Subchannels (audio, bridge, data, enhancedpacket, dabplus, dmb, packet, test
+
+; Define Subchannels (audio, bridge, data, enhancedpacket, dabplus, dmb, packet, test)
 subchannels {
-sub-pgm1 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 20
-zmq-prebuffering 10
-}
-sub-pgm2 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm3 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm4 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm5 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm6 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm7 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm8 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 128
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-pgm9 {
-type audio
-inputfile "tcp://*:1024"
-nonblock false
-bitrate 48
-protection 3
-zmq-buffer 40
-zmq-prebuffering 20
-}
-sub-epg {
-type packet
+sub-spi {
+type enhancedpacket
 bitrate 8
-protection 3
-inputuri "~/epg/epg.dat"
+inputuri "~/spi/output.dat"
 } 
 }
-	; Define Service Components (one component per sub for now!)
+
+; Define Service Components (one component per sub for now!)
 components {
-	; the component unique identifiers are used for the RC.
 comp-pgm1 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
 type 0
 service srv-pgm1
-subchannel sub-pgm1
-figtype 0x02
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
+figtype 0x02 ; Slideshow
 }
-comp-pgm2 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm2
-subchannel sub-pgm2
-figtype 2
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm3 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm3
-subchannel sub-pgm3
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm4 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm4
-subchannel sub-pgm4
-figtype 0x02
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm5 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm5
-subchannel sub-pgm5
-figtype 0x02
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm6 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm6
-subchannel sub-pgm6
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm7 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm7
-subchannel sub-pgm7
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm8 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm8
-subchannel sub-pgm8
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-comp-pgm9 {
-        ; specifies audio -or- packet type, defaults to zero when not given
-        ; audio: foreground=0, background=1, multi-channel=2
-        ; data: unspecified=0, TMC=1, EWS=2, ITTS=3, paging=4, TDC=5, IP=59, MOT=60, proprietary=61
-type 0
-
-service srv-pgm9
-subchannel sub-pgm9
-
-        ; for packet components, the fields
-        ; "user application type in FIG 0/13 for packet mode"
-        ;figtype
-        ; and "packet address (default: 0x200 + <n> (512))"
-        ;address
-        ; are supported, with the same syntax as in the manpage
-}
-
-comp-epg {
+comp-spi {
 type 60
-service srv-epg
-subchannel sub-epg
-figtype 0x7
+service srv-spi
+subchannel sub-spi
+figtype 0x7 ; SPI
 address 1
 datagroup true
 }
-
-comp-pgm1epg {
-type 60
-service srv-pgm1
-subchannel sub-epg
-figtype 7
-address 1
-datagroup true
 }
-
-}
-
-
