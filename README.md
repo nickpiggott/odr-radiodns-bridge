@@ -26,3 +26,8 @@ Install the following from pip:
 
 The resolver also uses a Boost Info file parser (from https://github.com/thecodemaiden/), which is included.
 
+## Example configuration file
+
+This tool usually uses the configuration file for an instance of [odr-dabmux](https://github.com/Opendigitalradio/ODR-DabMux). If you are not using odr-dabmux, a sample minimal configuration file is provided as mux.conf
+
+
