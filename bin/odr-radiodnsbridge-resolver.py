@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #===============================================================================
 # OpenDigitalRadio - RadioDNS Bridge - Resolver Code
 # 
