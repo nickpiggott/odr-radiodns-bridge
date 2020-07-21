@@ -111,7 +111,7 @@ def resolve_dns(services):
 	for service in services:
 		bearer = service["bearer"]
 		try: 
-			result = radiodns.lookupDABService("%X" % ((bearer.eid >> 4 & 0xf00) + bearer.ecc), "%X" % bearer.eid, "%X" % bearer.sid, "%X" % bearer.scids)
+			result = radiodns.lookup_dab("%X" % ((bearer.eid >> 4 & 0xf00) + bearer.ecc), "%X" % bearer.eid, "%X" % bearer.sid, "%X" % bearer.scids)
 		except:
 			result = None
 		service["dns"] = result
