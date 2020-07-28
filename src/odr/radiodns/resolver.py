@@ -148,7 +148,6 @@ def resolve_epg(filename,callback):
 	services = resolve_dns(parse_mux_config(filename))
 
 	radioepg_fqdn_list = []
-
 	
 	for service in services:
 		radioepg_fqdn = ""
