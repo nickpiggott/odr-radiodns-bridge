@@ -148,7 +148,7 @@ def resolve_epg(filename,callback):
 	services = resolve_dns(parse_mux_config(filename))
 
 	radioepg_fqdn_list = []
-	
+
 	for service in services:
 		radioepg_fqdn = ""
 	
@@ -173,6 +173,7 @@ def resolve_epg(filename,callback):
 							if not s.has_key("dns"): continue
 							if not s["dns"]: continue
 							if not s["dns"].has_key("authorative_fqdn"): continue
+							if not s["dns"]["applications"]["radioepg"]["supported"]: continue
 							if radioepg_fqdn == s["dns"]["authorative_fqdn"]:
 								EPGBearer.append(s["bearer"])
 								EPGServer = (s["dns"]["applications"]["radioepg"]["servers"])
