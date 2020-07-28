@@ -6,6 +6,7 @@ setup(
     name='odr-radiodns-bridge',
     version='1.0',
     packages=['odr', 'odr.radiodns'],
+    scripts=['bin/odr-radiodnsbridge-resolver'],
     package_dir = {'' : 'src'},
     url='https://github.com/nickpiggott/odr-radiodns-bridge',
     license='GNU Lesser General Public License 2.1',
