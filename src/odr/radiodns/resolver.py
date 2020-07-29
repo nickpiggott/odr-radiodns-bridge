@@ -151,13 +151,19 @@ def resolve_epg(filename,callback):
 
 	for service in services:
 		radioepg_fqdn = ""
+		hasEPG = False
 	
 		try:
 			radioepg_fqdn = service["dns"]["authorative_fqdn"]
 		except:
 			pass
 
-		if radioepg_fqdn:
+		try:
+			hasEPG = service["dns"]["applications"]["radioepg"]["supported"]
+		except:
+			pass
+
+		if radioepg_fqdn and hasEPG:
 				# check to see if we already have that FQDN
 				adding = True
 				for s in radioepg_fqdn_list:
