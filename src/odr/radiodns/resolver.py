@@ -220,11 +220,15 @@ def parse_mux_config(filename):
 		EPGpacketSize = None
 		EPGinputURI = None
 		EPGpacketAddress = None
-		
-		try:
-			service_ecc = (int(root["services"][0][service][0]["ecc"][0].getValue(),16))
-		except KeyError:
-			service_ecc = ensemble_ecc
+		service_id = int(root["services"][0][service][0]["id"][0].getValue(), 16)
+
+		if service_id>65535: 	# this is a long SId which contains ECC (first two nibbles)
+			service_ecc = (service_id >> 24)
+		else: 			# this is a short SId which does not contain the ECC
+			try:
+				service_ecc = (int(root["services"][0][service][0]["ecc"][0].getValue(),16))
+			except KeyError:
+				service_ecc = ensemble_ecc
 			
 		for component in components:
 			if component["service"] == service:
@@ -238,12 +242,11 @@ def parse_mux_config(filename):
 							EPGpacketSize = int(subchannel["bitrate"])*3
 							EPGinputURI = subchannel["inputuri"]
 									
-	
 		services.append(
 			{
 				"service" : service,
 				"label" : root["services"][0][service][0]["label"][0].getValue(),
-				"bearer" : DabBearer(service_ecc, ensemble_id, int(root["services"][0][service][0]["id"][0].getValue(), 16)),
+				"bearer" : DabBearer(service_ecc, ensemble_id, service_id),
 				"hasEPG" : hasEPG,
 				"hasSlideshow" : hasSlideshow,
 				"EPGpacketSize" : EPGpacketSize,
@@ -258,8 +261,14 @@ def resolve_dns(services):
 	radiodns = RadioDNS()
 	for service in services:
 		bearer = service["bearer"]
+		
+		if bearer.sid>65535: # this is a long SId which contains both ECC (first two nibbles) and CC (third nibble)
+			gcc = (bearer.sid >> 12 & 0xf00) + (bearer.sid >> 24)
+		else: # this is a short SId which contains only the CC (first nibble)
+			gcc = (bearer.sid >> 4 & 0xf00) + bearer.ecc
+			
 		try: 
-			result = radiodns.lookup_dab("%X" % ((bearer.eid >> 4 & 0xf00) + bearer.ecc), "%X" % bearer.eid, "%X" % bearer.sid, "%X" % bearer.scids)
+			result = radiodns.lookup_dab("%X" % gcc, "%X" % bearer.eid, "%X" % bearer.sid, "%X" % bearer.scids)
 		except:
 			result = None
 		service["dns"] = result
