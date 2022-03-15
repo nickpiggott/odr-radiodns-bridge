@@ -333,9 +333,9 @@ def resolve_epg(filename,callback):
 						EPGServer = []					
 						
 						for s in services:
-							if not s.has_key("dns"): continue
+							if "dns" not in s: continue
 							if not s["dns"]: continue
-							if not s["dns"].has_key("authorative_fqdn"): continue
+							if "authorative_fqdn" not in s["dns"]: continue
 							if not s["dns"]["applications"]["radioepg"]["supported"]: continue
 							if radioepg_fqdn == s["dns"]["authorative_fqdn"]:
 								EPGBearer.append(s["bearer"])
