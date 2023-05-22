@@ -166,6 +166,19 @@ class BoostInfoParser(object):
             ctxList = newList
         
         return ctxList
+
+def parse_mux_ensemble(filename):
+
+        parser = BoostInfoParser()
+        parser.read(filename)
+        root = parser.getRoot()
+        
+        ecc = int(root["ensemble"][0]["ecc"][0].getValue(), 16)
+        eid = int(root["ensemble"][0]["id"][0].getValue(), 16)
+        label = root["ensemble"][0]["label"][0].getValue()
+        shortlabel = root["ensemble"][0]["shortlabel"][0].getValue()
+
+        return ecc,eid,label,shortlabel
         
 def parse_mux_config(filename):
 	parser = BoostInfoParser()
