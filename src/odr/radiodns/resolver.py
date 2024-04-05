@@ -364,7 +364,8 @@ def resolve_epg(filename,callback):
 								EPGServer = (s["dns"]["applications"][app]["servers"])
 						radioepg_fqdn_list.append({"fqdn" : radioepg_fqdn,
 								"bearers": EPGBearer,
-								"servers" : EPGServer })
+								"servers" : EPGServer,
+								"app" : app })
 
 
 	callback(radioepg_fqdn_list)
