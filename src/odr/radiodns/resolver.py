@@ -322,7 +322,9 @@ def resolve_epg(filename,callback):
 	for service in services:
 		radioepg_fqdn = ""
 		hasEPG = False
-	
+		hasSPI = False
+		app = ""
+
 		try:
 			radioepg_fqdn = service["dns"]["authorative_fqdn"]
 		except:
@@ -330,10 +332,17 @@ def resolve_epg(filename,callback):
 
 		try:
 			hasEPG = service["dns"]["applications"]["radioepg"]["supported"]
+			app = "radioepg"
 		except:
 			pass
 
-		if radioepg_fqdn and hasEPG:
+		try:
+			hasSPI = service["dns"]["applications"]["radiospi"]["supported"]
+			app = "radiospi"
+		except:
+			pass
+
+		if radioepg_fqdn and (hasEPG or hasSPI):
 				# check to see if we already have that FQDN
 				adding = True
 				for s in radioepg_fqdn_list:
@@ -349,10 +358,10 @@ def resolve_epg(filename,callback):
 							if "dns" not in s: continue
 							if not s["dns"]: continue
 							if "authorative_fqdn" not in s["dns"]: continue
-							if not s["dns"]["applications"]["radioepg"]["supported"]: continue
+							if not s["dns"]["applications"][app]["supported"]: continue
 							if radioepg_fqdn == s["dns"]["authorative_fqdn"]:
 								EPGBearer.append(s["bearer"])
-								EPGServer = (s["dns"]["applications"]["radioepg"]["servers"])
+								EPGServer = (s["dns"]["applications"][app]["servers"])
 						radioepg_fqdn_list.append({"fqdn" : radioepg_fqdn,
 								"bearers": EPGBearer,
 								"servers" : EPGServer })
