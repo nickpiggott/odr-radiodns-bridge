@@ -323,7 +323,7 @@ def resolve_epg(filename,callback):
 		radioepg_fqdn = ""
 		hasEPG = False
 		hasSPI = False
-		app = ""
+		app = "radioepg"
 
 		try:
 			radioepg_fqdn = service["dns"]["authorative_fqdn"]
@@ -332,15 +332,15 @@ def resolve_epg(filename,callback):
 
 		try:
 			hasEPG = service["dns"]["applications"]["radioepg"]["supported"]
-			app = "radioepg"
 		except:
 			pass
 
 		try:
 			hasSPI = service["dns"]["applications"]["radiospi"]["supported"]
-			app = "radiospi"
 		except:
 			pass
+
+		if hasSPI == True: app="radiospi"
 
 		if radioepg_fqdn and (hasEPG or hasSPI):
 				# check to see if we already have that FQDN
